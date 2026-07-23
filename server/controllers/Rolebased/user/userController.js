@@ -3,7 +3,6 @@ const response = require("../../../utils/ResponseHandler")
 module.exports = {
   getProfile: async (req, res) => {
     try {
-      // req.user.id comes from the verifyToken middleware
       const user = await User.findById(req.user.id).select("-password");
 
       if (!user) {

@@ -26,18 +26,14 @@ const generateTokens = (user) => {
 
 // --- VERIFY TOKENS ---
 
-// Access Token verify karne ke liye
 const verifyAccessToken = (token) => {
   try {
-    // Agar token valid hai, toh yeh decoded payload return karega
     return jwt.verify(token, ACCESS_SECRET);
   } catch (error) {
-    // Token expire ho gaya ho ya invalid ho, toh null return karega
     return null; 
   }
 };
 
-// Refresh Token verify karne ke liye
 const verifyRefreshToken = (token) => {
   try {
     return jwt.verify(token, REFRESH_SECRET);
@@ -50,6 +46,6 @@ module.exports = {
   createAccessToken,
   createRefreshToken,
   generateTokens,
-  verifyAccessToken,  // Export the new functions
+  verifyAccessToken, 
   verifyRefreshToken,
 };
