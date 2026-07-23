@@ -51,4 +51,67 @@ module.exports = {
 
     handleValidationErrors,
   ],
+
+  validateSendOTP : [
+  body('email')
+    .trim()
+    .notEmpty()
+    .withMessage('Email is required')
+    .isEmail()
+    .withMessage('Invalid email format'),
+
+  handleValidationErrors,
+],
+
+  validateVerifyOTP: [
+  body('email')
+    .trim()
+    .notEmpty()
+    .withMessage('Email is required')
+    .isEmail()
+    .withMessage('Invalid email format'),
+
+  body('otp')
+    .notEmpty()
+    .withMessage('OTP is required')
+    .isNumeric()
+    .withMessage('OTP must be a number'),
+
+  handleValidationErrors,
+],
+
+  validateNewPassword : [
+  body('email')
+    .trim()
+    .notEmpty()
+    .withMessage('Email is required')
+    .isEmail()
+    .withMessage('Invalid email format'),
+
+  body('otp')
+    .notEmpty()
+    .withMessage('OTP is required')
+    .isNumeric()
+    .withMessage('OTP must be a number'),
+
+  body('password')
+    .notEmpty()
+    .withMessage('Password is required')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters long'),
+
+  body('confirmPassword')
+    .notEmpty()
+    .withMessage('Confirm password is required')
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error('Passwords do not match');
+      }
+      return true;
+    }),
+
+  handleValidationErrors,
+],
+
+
 };

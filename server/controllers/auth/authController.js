@@ -48,7 +48,6 @@ module.exports = {
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
-
       const user = await User.findOne({ email });
       if (!user) {
         return response.error(res, 401, "Invalid credentials");
