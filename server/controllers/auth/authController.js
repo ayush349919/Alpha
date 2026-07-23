@@ -108,4 +108,18 @@ module.exports = {
       return response.error(res, 500, "Internal server Error");
     }
   },
+  logout: async (req, res) => {
+    try {
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+      });
+
+      return response.success(res, 200, "logged out successfully");
+    } catch (error) {
+      console.error("Logout Error:", error);
+      return response.error(res, 500, "Internal Server Error during logout");
+    }
+  },
 };

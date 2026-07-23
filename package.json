@@ -2,11 +2,11 @@
   "name": "alpha",
   "version": "1.0.0",
   "description": "",
-"scripts": {
-  "server": "npm --prefix server run dev",
-  "client": "npm --prefix client run dev",
-  "dev": "concurrently -n \"SERVER,CLIENT\" -c \"magenta,cyan\" \"npm run server\" \"npm run client\""
-},
+  "scripts": {
+    "server": "npm --prefix server run dev",
+    "client": "npm --prefix client run dev",
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"magenta,cyan\" \"npm run server\" \"npm run client\""
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ayush349919/Alpha.git"
@@ -21,5 +21,8 @@
   "homepage": "https://github.com/ayush349919/Alpha#readme",
   "devDependencies": {
     "concurrently": "^10.0.3"
+  },
+  "dependencies": {
+    "nodemailer": "^9.0.3"
   }
 }
