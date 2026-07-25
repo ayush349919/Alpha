@@ -138,7 +138,11 @@ module.exports = {
 
       const refreshToken = req.cookies?.refreshToken;
       if (!refreshToken) {
-        res.clearCookie("refreshToken")
+        res.clearCookie("refreshToken", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+        });
         return response.success(res, 200, "Logged out successfully");
       }
 
