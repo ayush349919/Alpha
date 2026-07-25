@@ -6,6 +6,7 @@ const {
   verifyRefreshToken,
   createAccessToken,
 } = require("../../tokens/tokens");
+const { redisClient } = require("../../config/redis");
 
 module.exports = {
   register: async (req, res) => {
@@ -27,6 +28,14 @@ module.exports = {
       });
       const { accessToken, refreshToken } = generateTokens(user);
 
+      await redisClient.set(
+        `refresh:${user._id}`,
+        refreshToken,
+        {
+          EX: 7 * 24 * 60 * 60,  // 7 days expiry
+        }
+      );
+
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -35,9 +44,6 @@ module.exports = {
       });
 
       return response.success(res, 201, "User registered successfully", {
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
         accessToken,
       });
     } catch (error) {
@@ -45,6 +51,7 @@ module.exports = {
       return response.error(res, 500, "Something went wrong");
     }
   },
+
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
@@ -60,6 +67,13 @@ module.exports = {
 
       const { accessToken, refreshToken } = generateTokens(user);
 
+      await redisClient.set(
+        `refresh:${user._id}`,
+        refreshToken,
+        {
+          EX: 7 * 24 * 60 * 60,  // 7 days expiry
+        }
+      );
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -68,28 +82,38 @@ module.exports = {
       });
 
       return response.success(res, 200, "Login successful", {
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        role: user.role,
-        accessToken,
+        accessToken
       });
     } catch (error) {
       console.log(error.message);
       return response.error(res, 500, "Something went wrong");
     }
   },
+
   refreshAccessToken: async (req, res) => {
     try {
-      const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+      const refreshToken = req.cookies?.refreshToken;
 
       if (!refreshToken) {
-        return response.error(res, 401, "Please login again.");
+        return response.error(res, 401, "Session Expired please login again");
       }
 
       const decoded = verifyRefreshToken(refreshToken);
       if (!decoded) {
         return response.error(res, 403, "Refresh token is invalid or expired.");
+      }
+
+      const storedToken = await redisClient.get(
+        `refresh:${decoded.id}`
+      );
+
+      if (!storedToken) {
+        return response.error(res, 401, "Session Expired please login again");
+      }
+
+      if (storedToken !== refreshToken) {
+        return response.error(res, 401, "Session Expired please login again");
+
       }
 
       const user = await User.findById(decoded.id);
@@ -98,22 +122,38 @@ module.exports = {
       }
 
       const newAccessToken = createAccessToken(user);
-      return res.status(200).json({
-        message: "Token refreshed successfully",
-        accessToken: newAccessToken,
-      });
+      return response.success(res, 200, "Token refreshed successfully",
+        {
+          accessToken: newAccessToken
+        });
+
     } catch (error) {
       console.error(error);
       return response.error(res, 500, "Internal server Error");
     }
   },
+
   logout: async (req, res) => {
     try {
+
+      const refreshToken = req.cookies?.refreshToken;
+      if (!refreshToken) {
+        return response.error(res, 401, "Already logged out");
+      }
+
+      const decoded = verifyRefreshToken(refreshToken)
+      if (decoded) {
+        await redisClient.del(
+          `refresh:${decoded.id}`
+        )
+      }
+
       res.clearCookie("refreshToken", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax",
       });
+
 
       return response.success(res, 200, "logged out successfully");
     } catch (error) {
@@ -121,4 +161,14 @@ module.exports = {
       return response.error(res, 500, "Internal Server Error during logout");
     }
   },
+  //   testRedis : async(req, res) => {
+  //   await redisClient.set("name", "Ayush");
+
+  //   const data = await redisClient.get("name");
+
+  //   return res.json({
+  //     success: true,
+  //     data,
+  //   })
+  // }
 };

@@ -4,6 +4,7 @@ dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const dotenv = require("dotenv");
 
 dotenv.config();
+const { connectRedis, redisClient } = require('./config/redis')
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 // const helmet = require("helmet");
@@ -14,6 +15,7 @@ const authRoutes = require("./routes/auth.route");
 const userRoutes = require("./routes/rolebased/user/user.route");
 
 connectToMongoDB();
+connectRedis();
 const app = express();
 // app.use(helmet)
 app.use(morgan("dev"));
@@ -21,7 +23,6 @@ app.use(morgan("dev"));
 const corsOptions = {
   origin: process.env.CLIENT_URL || 'http://localhost:5173',
   credentials: true,
-  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
 };
 
 app.use(cors(corsOptions));

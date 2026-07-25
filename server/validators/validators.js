@@ -52,66 +52,75 @@ module.exports = {
     handleValidationErrors,
   ],
 
-  validateSendOTP : [
-  body('email')
-    .trim()
-    .notEmpty()
-    .withMessage('Email is required')
-    .isEmail()
-    .withMessage('Invalid email format'),
+  validateSendOTP: [
+    body('email')
+      .trim()
+      .notEmpty()
+      .withMessage('Email is required')
+      .isEmail()
+      .withMessage('Invalid email format'),
 
-  handleValidationErrors,
-],
+    handleValidationErrors,
+  ],
 
   validateVerifyOTP: [
-  body('email')
-    .trim()
-    .notEmpty()
-    .withMessage('Email is required')
-    .isEmail()
-    .withMessage('Invalid email format'),
+    body('email')
+      .trim()
+      .toLowerCase()
+      .notEmpty()
+      .withMessage('Email is required')
+      .isEmail()
+      .withMessage('Invalid email format'),
 
-  body('otp')
-    .notEmpty()
-    .withMessage('OTP is required')
-    .isNumeric()
-    .withMessage('OTP must be a number'),
 
-  handleValidationErrors,
-],
+    body('otp')
+      .trim()
+      .notEmpty()
+      .withMessage('OTP is required')
+      .isNumeric()
+      .withMessage('OTP must contain only numbers')
+      .isLength({ min: 6, max: 6 })
+      .withMessage('OTP must be 6 digits'),
 
-  validateNewPassword : [
-  body('email')
-    .trim()
-    .notEmpty()
-    .withMessage('Email is required')
-    .isEmail()
-    .withMessage('Invalid email format'),
+    handleValidationErrors,
+  ],
 
-  body('otp')
-    .notEmpty()
-    .withMessage('OTP is required')
-    .isNumeric()
-    .withMessage('OTP must be a number'),
+  validateNewPassword: [
+    body('email')
+      .trim()
+      .toLowerCase()
+      .notEmpty()
+      .withMessage('Email is required')
+      .isEmail()
+      .withMessage('Invalid email format'),
 
-  body('password')
-    .notEmpty()
-    .withMessage('Password is required')
-    .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters long'),
+    body('otp')
+      .trim()
+      .notEmpty()
+      .withMessage('OTP is required')
+      .isLength({ min: 6, max: 6 })
+      .withMessage('OTP must be 6 digits')
+      .isNumeric()
+      .withMessage('OTP must contain only numbers'),
 
-  body('confirmPassword')
-    .notEmpty()
-    .withMessage('Confirm password is required')
-    .custom((value, { req }) => {
-      if (value !== req.body.password) {
-        throw new Error('Passwords do not match');
-      }
-      return true;
-    }),
+    body('password')
+      .notEmpty()
+      .withMessage('Password is required')
+      .isLength({ min: 6 })
+      .withMessage('Password must be at least 6 characters long'),
 
-  handleValidationErrors,
-],
+    body('confirmPassword')
+      .notEmpty()
+      .withMessage('Confirm password is required')
+      .custom((value, { req }) => {
+        if (value !== req.body.password) {
+          throw new Error('Passwords do not match');
+        }
+        return true;
+      }),
+
+    handleValidationErrors,
+  ],
 
 
 };

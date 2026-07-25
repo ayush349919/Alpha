@@ -1,8 +1,10 @@
 // Middleware to authorize specific roles
+const response = require('../utils/ResponseHandler')
+
 const authorize = (...allowedRoles) => {
   return (req, res, next) => {
     if (!req.user || !allowedRoles.includes(req.user.role)) {
-      return res.status(403).json({ message: 'Access denied: Insufficient permissions' });
+      return response.error(res, 403, "Access denied: Insufficient permissions")
     }
     next();
   };
