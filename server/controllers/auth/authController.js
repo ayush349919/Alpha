@@ -138,7 +138,8 @@ module.exports = {
 
       const refreshToken = req.cookies?.refreshToken;
       if (!refreshToken) {
-        return response.error(res, 401, "Already logged out");
+        res.clearCookie("refreshToken")
+        return response.success(res, 200, "Logged out successfully");
       }
 
       const decoded = verifyRefreshToken(refreshToken)

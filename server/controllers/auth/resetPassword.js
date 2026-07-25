@@ -110,7 +110,7 @@ module.exports = {
       return response.success(res, 200, "OTP verified successfully");
 
     } catch (error) {
-      console.error("Verify OTP Error:", error.message);
+      console.error("Verify OTP Error:", error.message);  
       return response.error(res, 500, "Internal Server Error");
     }
   },
