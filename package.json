@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "redis": "docker start redis-server",
     "server": "npm --prefix server run dev",
     "client": "npm --prefix client run dev",
-    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"magenta,cyan\" \"npm run server\" \"npm run client\""
+    "dev": "npm run redis && concurrently -n \"SERVER,CLIENT\" -c \"magenta,cyan\" \"npm run server\" \"npm run client\""
   },
   "repository": {
     "type": "git",

@@ -13,6 +13,7 @@ const cors = require("cors");
 const { connectToMongoDB } = require("./config/db");
 const authRoutes = require("./routes/auth.route");
 const userRoutes = require("./routes/rolebased/user/user.route");
+const { default: mongoose } = require("mongoose");
 
 connectToMongoDB();
 connectRedis();
@@ -38,5 +39,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
 module.exports = app;

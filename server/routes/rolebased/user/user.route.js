@@ -7,6 +7,6 @@ const validator =  require("../../../validators/validators")
 router.get("/profile", tokenVerfication, userController.getProfile);
 router.put("/updateprofile", tokenVerfication, validator.updateProfile, userController.updateProfile);
 router.put("/changepassword",tokenVerfication, validator.changePassword,  userController.changePassword)
-router.delete("/deleteaccount", tokenVerfication, validator.deleteAccount, userController.dele )
+router.delete("/deleteaccount", tokenVerfication, validator.deleteAccount, userController.deleteAccount )
 
 module.exports = router

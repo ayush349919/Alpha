@@ -1,181 +1,386 @@
-# 🔐 Alpha Auth System
+# Alpha - MERN Authentication & User Management Backend
 
-A modern authentication system built with the MERN stack, focusing on secure user authentication, authorization, and session management.
+A secure and scalable authentication & user management backend built with Node.js, Express.js, MongoDB, Redis, and JWT.
 
-## 🚀 Current Features
+This project implements modern authentication practices including Access Tokens, Refresh Tokens, Redis-based session management, OTP-based password recovery, rate limiting, cooldown protection, and user account management.
+
+---
+
+## Features
 
 ### Authentication
 
-* User Registration
-* User Login
-* JWT Access Token Authentication
-* Refresh Token Authentication
-* Secure Password Hashing using bcrypt
+- User Registration
+- User Login
+- JWT Access Token Authentication
+- JWT Refresh Token Authentication
+- Redis-Based Refresh Token Storage
+- Secure Logout
+- Protected Routes Middleware
 
 ### Password Recovery
 
-* Forgot Password API
-* OTP Generation & Verification
-* Password Reset via Email
-* Nodemailer Email Integration
+- Forgot Password
+- OTP Generation via Email
+- OTP Verification
+- Password Reset
 
-### Security
+### OTP Security
 
-* Access Token & Refresh Token Architecture
-* Refresh Token Rotation Support
-* Secure Cookie-Based Session Management
-* Environment Variable Configuration
-* Protected Routes Middleware
+- OTP Expiry (5 Minutes)
+- OTP Cooldown Protection
+- OTP Request Rate Limiting
+- OTP Verification Attempt Limiting
+
+### User Management
+
+- Get User Profile
+- Update User Profile
+- Change Password
+- Delete Account
+
+### Security Features
+
+- Password Hashing with bcrypt
+- HttpOnly Refresh Token Cookies
+- Redis Session Management
+- Password Reuse Prevention
+- Express Validator Request Validation
+- Protected API Endpoints
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Backend
 
-* Node.js
-* Express.js
-* MongoDB
-* Mongoose
-* JWT (JSON Web Token)
-* bcryptjs
-* Nodemailer
-* Cookie Parser
+- Node.js
+- Express.js
 
-### Frontend (In Progress)
+### Database
 
-* React.js
-* Redux Toolkit
-* Axios
-* React Router DOM
+- MongoDB Atlas
+- Mongoose
+
+### Caching & Session Management
+
+- Redis
+
+### Authentication & Security
+
+- JWT (JSON Web Tokens)
+- bcrypt
+- Express Validator
+- Cookie Parser
+
+### Email Service
+
+- Nodemailer
+
+### Development Tools
+
+- Nodemon
+- Concurrently
+- Morgan
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```bash
-Alpha/
+server/
 │
-├── client/          # React Frontend
+├── config/
+│   ├── db.js
+│   └── redis.js
 │
-├── server/
-│   ├── Config/
-│   ├── Controllers/
-│   ├── Middleware/
-│   ├── Models/
-│   ├── Routes/
-│   └── Utils/
+├── controllers/
+│   ├── auth/
+│   └── rolebased/
 │
-└── README.md
+├── middlewares/
+│   └── verifyToken.js
+│
+├── models/
+│   └── User.js
+│
+├── routes/
+│   ├── auth.route.js
+│   └── rolebased/
+│
+├── tokens/
+│   └── tokens.js
+│
+├── utils/
+│   ├── ResponseHandler.js
+│   ├── rateLimiter.js
+│   └── otpCooldown.js
+│
+├── validators/
+│   └── validators.js
+│
+└── app.js
 ```
 
 ---
 
-## 🔄 Authentication Flow
+## Authentication Flow
 
-### Login Flow
-
-1. User submits email and password.
-2. Server validates credentials.
-3. Access Token is generated and returned.
-4. Refresh Token is stored securely in an HttpOnly Cookie.
-5. Protected routes use Access Token for authorization.
-6. When Access Token expires, Refresh Token generates a new Access Token.
-
----
-
-## 🔑 Password Reset Flow
-
-1. User enters email.
-2. OTP is generated and sent via Nodemailer.
-3. User verifies OTP.
-4. User creates a new password.
-5. Password is securely hashed and updated in MongoDB.
+```text
+User Login
+      ↓
+Generate Access Token (15 Minutes)
+      ↓
+Generate Refresh Token (7 Days)
+      ↓
+Store Refresh Token in Redis
+      ↓
+Store Refresh Token in HttpOnly Cookie
+      ↓
+Access Protected Routes
+      ↓
+Refresh Endpoint Generates New Access Token
+```
 
 ---
 
-## 📌 Upcoming Features
+## Password Reset Flow
 
-### Frontend Integration
-
-* React Authentication UI
-* Redux Toolkit State Management
-* Axios Interceptors
-* Protected Routes
-* Automatic Token Refresh
-
-### Security Enhancements
-
-* Two Factor Authentication (2FA)
-* Account Verification
-* Login Activity Tracking
-* Session Management
-
-### Future Plans
-
-* Google OAuth Authentication
-* Role-Based Access Control (RBAC)
-* User Profile Management
-* Complete Full Stack Authentication Boilerplate
+```text
+User Enters Email
+      ↓
+Generate OTP
+      ↓
+Store OTP in Redis (5 Minutes)
+      ↓
+Send OTP via Email
+      ↓
+Verify OTP
+      ↓
+Store Verification State in Redis
+      ↓
+Create New Password
+      ↓
+Update Password
+      ↓
+Remove Verification State
+```
 
 ---
 
-## ⚙️ Installation
+## API Endpoints
+
+### Authentication
+
+#### Register User
+
+```http
+POST /api/auth/register
+```
+
+#### Login User
+
+```http
+POST /api/auth/login
+```
+
+#### Refresh Access Token
+
+```http
+POST /api/auth/refresh-token
+```
+
+#### Logout User
+
+```http
+POST /api/auth/logout
+```
+
+---
+
+### Password Recovery
+
+#### Send OTP
+
+```http
+POST /api/auth/send-otp
+```
+
+#### Verify OTP
+
+```http
+POST /api/auth/verify-otp
+```
+
+#### Reset Password
+
+```http
+PUT /api/auth/new-password
+```
+
+---
+
+### User Management
+
+#### Get Profile
+
+```http
+GET /api/user/profile
+```
+
+#### Update Profile
+
+```http
+PUT /api/user/updateprofile
+```
+
+#### Change Password
+
+```http
+PUT /api/user/changepassword
+```
+
+#### Delete Account
+
+```http
+DELETE /api/user/deleteaccount
+```
+
+---
+
+## Environment Variables
+
+Create a `.env` file inside the server directory.
+
+```env
+PORT=5000
+
+MONGO_URI=your_mongodb_connection_string
+
+ACCESS_TOKEN_SECRET=your_access_secret
+
+REFRESH_TOKEN_SECRET=your_refresh_secret
+
+EMAIL_USER=your_email
+
+EMAIL_PASS=your_email_password
+
+CLIENT_URL=http://localhost:5173
+```
+
+---
+
+## Installation
 
 ### Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/alpha-auth-system.git
-cd alpha-auth-system
+git clone https://github.com/ayush349919/Alpha.git
 ```
 
-### Backend Setup
+### Navigate to Project
+
+```bash
+cd Alpha
+```
+
+### Install Dependencies
+
+#### Root
+
+```bash
+npm install
+```
+
+#### Backend
 
 ```bash
 cd server
 npm install
 ```
 
-Create a `.env` file:
-
-```env
-PORT=5000
-MONGO_URI=your_mongodb_uri
-ACCESS_TOKEN_SECRET=your_secret
-REFRESH_TOKEN_SECRET=your_secret
-EMAIL=your_email
-APP_PASSWORD=your_app_password
-```
-
-Start the backend:
+#### Frontend
 
 ```bash
-npm run dev
-```
-
-### Frontend Setup
-
-```bash
-cd client
+cd ../client
 npm install
-npm run dev
 ```
 
 ---
 
-## 🎯 Current Status
+## Redis Setup
 
-The backend authentication system is functional and includes JWT authentication, refresh tokens, email-based password recovery, and secure session handling.
+Start Redis Container
 
-The next development phase focuses on integrating the frontend with React and Redux Toolkit, implementing token persistence, automatic refresh token handling, and complete authentication workflows.
+```bash
+docker start redis-server
+```
+
+Verify Redis
+
+```bash
+docker ps
+```
 
 ---
 
-## 👨‍💻 Author
+## Run Project
 
-**Ayush Thakur**
+From root directory:
 
-MERN Stack Developer
+```bash
+npm run dev
+```
 
-GitHub: https://github.com/ayush349919
-LinkedIn: https://linkedin.com/in/ayushthakur9919
+Frontend:
+
+```text
+http://localhost:5173
+```
+
+Backend:
+
+```text
+http://localhost:5000
+```
+
+---
+
+## Current Status
+
+### Completed
+
+- User Registration
+- User Login
+- JWT Authentication
+- Access Token & Refresh Token System
+- Redis Session Management
+- Secure Logout
+- OTP-Based Password Recovery
+- OTP Cooldown Protection
+- OTP Rate Limiting
+- OTP Verification Attempt Limiting
+- User Profile APIs
+- Change Password API
+- Delete Account API
+
+### Upcoming
+
+- Redux Toolkit Integration
+- Axios Interceptors
+- Automatic Token Refresh Handling
+- Frontend Protected Routes
+- Role-Based Access Control (RBAC)
+- Docker Compose Setup
+- Deployment
+
+---
+
+## Author
+
+Ayush Thakur
+
+- LinkedIn: https://linkedin.com/in/ayushthakur9919
+- GitHub: https://github.com/ayush349919
+
+---
