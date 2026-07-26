@@ -1,10 +1,11 @@
 const { redisClient } = require("../../../config/redis");
 const User = require("../../../models/User");
 const response = require("../../../utils/ResponseHandler")
+const bcrypt = require('bcrypt')
 module.exports = {
   getProfile: async (req, res) => {
     try {
-      const user = await User.findById(req.user.id).select("-password");
+      const user = await User.findById(req.user.id).select("-password -role");
 
       if (!user) {
         return response.error(res, 404, "User not found");
@@ -56,12 +57,12 @@ module.exports = {
       if (!user) {
         return response.error(res, 404, "User not found");
       }
-      const isCurrentPasswordValid = await bcrypt.comapre(currentPassword, user.password);
+      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
       if (!isCurrentPasswordValid) {
         return response.error(res, 400, "Current password is incorrect");
       }
 
-      const samePassword = await bcrypt.comapre(
+      const samePassword = await bcrypt.compare(
         newPassword,
         user.password
       );
@@ -73,6 +74,7 @@ module.exports = {
       const hashedPassword = await bcrypt.hash(newPassword, 10);
 
       user.password = hashedPassword;
+      user.passwordChangedAt = new Date();
       await user.save()
       await redisClient.del(`refresh:${user._id}`);
 
@@ -120,7 +122,7 @@ module.exports = {
     await User.findByIdAndDelete(
       user._id
     );
-    
+
     res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

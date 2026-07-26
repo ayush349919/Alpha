@@ -94,14 +94,14 @@ module.exports = {
       .isEmail()
       .withMessage('Invalid email format'),
 
-    body('otp')
-      .trim()
-      .notEmpty()
-      .withMessage('OTP is required')
-      .isLength({ min: 6, max: 6 })
-      .withMessage('OTP must be 6 digits')
-      .isNumeric()
-      .withMessage('OTP must contain only numbers'),
+    // body('otp')
+    //   .trim()
+    //   .notEmpty()
+    //   .withMessage('OTP is required')
+    //   .isLength({ min: 6, max: 6 })
+    //   .withMessage('OTP must be 6 digits')
+    //   .isNumeric()
+    //   .withMessage('OTP must contain only numbers'),
 
     body('password')
       .notEmpty()

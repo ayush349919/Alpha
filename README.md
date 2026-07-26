@@ -1,8 +1,8 @@
-# Alpha - MERN Authentication & User Management Backend
+# Alpha
 
-A secure and scalable authentication & user management backend built with Node.js, Express.js, MongoDB, Redis, and JWT.
+A secure MERN authentication and user management system built with Node.js, Express.js, MongoDB Atlas, Redis, and JWT.
 
-This project implements modern authentication practices including Access Tokens, Refresh Tokens, Redis-based session management, OTP-based password recovery, rate limiting, cooldown protection, and user account management.
+The project focuses on modern authentication practices including Access Tokens, Refresh Tokens, Redis session management, OTP-based password recovery, password invalidation, and user account management.
 
 ---
 
@@ -14,28 +14,32 @@ This project implements modern authentication practices including Access Tokens,
 - User Login
 - JWT Access Token Authentication
 - JWT Refresh Token Authentication
-- Redis-Based Refresh Token Storage
 - Secure Logout
 - Protected Routes Middleware
+
+### Session Management
+
+- Redis-Based Refresh Token Storage
+- Refresh Token Validation
+- Refresh Token Revocation on Logout
 
 ### Password Recovery
 
 - Forgot Password
-- OTP Generation via Email
-- OTP Verification
+- Email OTP Verification
 - Password Reset
 
 ### OTP Security
 
-- OTP Expiry (5 Minutes)
+- OTP Expiry
 - OTP Cooldown Protection
 - OTP Request Rate Limiting
 - OTP Verification Attempt Limiting
 
 ### User Management
 
-- Get User Profile
-- Update User Profile
+- Get Profile
+- Update Profile
 - Change Password
 - Delete Account
 
@@ -43,9 +47,9 @@ This project implements modern authentication practices including Access Tokens,
 
 - Password Hashing with bcrypt
 - HttpOnly Refresh Token Cookies
-- Redis Session Management
-- Password Reuse Prevention
 - Express Validator Request Validation
+- Password Reuse Prevention
+- Password Change Token Invalidation
 - Protected API Endpoints
 
 ---
@@ -62,13 +66,13 @@ This project implements modern authentication practices including Access Tokens,
 - MongoDB Atlas
 - Mongoose
 
-### Caching & Session Management
+### Cache & Session Storage
 
 - Redis
 
 ### Authentication & Security
 
-- JWT (JSON Web Tokens)
+- JWT
 - bcrypt
 - Express Validator
 - Cookie Parser
@@ -85,60 +89,21 @@ This project implements modern authentication practices including Access Tokens,
 
 ---
 
-## Project Structure
-
-```bash
-server/
-│
-├── config/
-│   ├── db.js
-│   └── redis.js
-│
-├── controllers/
-│   ├── auth/
-│   └── rolebased/
-│
-├── middlewares/
-│   └── verifyToken.js
-│
-├── models/
-│   └── User.js
-│
-├── routes/
-│   ├── auth.route.js
-│   └── rolebased/
-│
-├── tokens/
-│   └── tokens.js
-│
-├── utils/
-│   ├── ResponseHandler.js
-│   ├── rateLimiter.js
-│   └── otpCooldown.js
-│
-├── validators/
-│   └── validators.js
-│
-└── app.js
-```
-
----
-
 ## Authentication Flow
 
 ```text
 User Login
-      ↓
+    ↓
 Generate Access Token (15 Minutes)
-      ↓
+    ↓
 Generate Refresh Token (7 Days)
-      ↓
+    ↓
 Store Refresh Token in Redis
-      ↓
+    ↓
 Store Refresh Token in HttpOnly Cookie
-      ↓
+    ↓
 Access Protected Routes
-      ↓
+    ↓
 Refresh Endpoint Generates New Access Token
 ```
 
@@ -147,23 +112,41 @@ Refresh Endpoint Generates New Access Token
 ## Password Reset Flow
 
 ```text
-User Enters Email
-      ↓
+User Requests Password Reset
+            ↓
 Generate OTP
-      ↓
-Store OTP in Redis (5 Minutes)
-      ↓
+            ↓
+Store OTP in Redis
+            ↓
 Send OTP via Email
-      ↓
+            ↓
 Verify OTP
-      ↓
-Store Verification State in Redis
-      ↓
-Create New Password
-      ↓
+            ↓
+Create Password Reset Session
+            ↓
+Set New Password
+            ↓
+Delete OTP & Reset Session
+```
+
+---
+
+## Password Change Security Flow
+
+```text
+User Changes Password
+        ↓
 Update Password
-      ↓
-Remove Verification State
+        ↓
+Set passwordChangedAt
+        ↓
+Delete Refresh Token From Redis
+        ↓
+Clear Refresh Token Cookie
+        ↓
+Invalidate Previously Issued Tokens
+        ↓
+Force Re-Login
 ```
 
 ---
@@ -172,77 +155,27 @@ Remove Verification State
 
 ### Authentication
 
-#### Register User
-
 ```http
 POST /api/auth/register
-```
-
-#### Login User
-
-```http
 POST /api/auth/login
-```
-
-#### Refresh Access Token
-
-```http
 POST /api/auth/refresh-token
-```
-
-#### Logout User
-
-```http
 POST /api/auth/logout
 ```
 
----
-
 ### Password Recovery
-
-#### Send OTP
 
 ```http
 POST /api/auth/send-otp
-```
-
-#### Verify OTP
-
-```http
 POST /api/auth/verify-otp
+PUT  /api/auth/new-password
 ```
 
-#### Reset Password
+### User
 
 ```http
-PUT /api/auth/new-password
-```
-
----
-
-### User Management
-
-#### Get Profile
-
-```http
-GET /api/user/profile
-```
-
-#### Update Profile
-
-```http
-PUT /api/user/updateprofile
-```
-
-#### Change Password
-
-```http
-PUT /api/user/changepassword
-```
-
-#### Delete Account
-
-```http
+GET    /api/user/profile
+PUT    /api/user/updateprofile
+PUT    /api/user/changepassword
 DELETE /api/user/deleteaccount
 ```
 
@@ -257,9 +190,9 @@ PORT=5000
 
 MONGO_URI=your_mongodb_connection_string
 
-ACCESS_TOKEN_SECRET=your_access_secret
+ACCESS_TOKEN_SECRET=your_access_token_secret
 
-REFRESH_TOKEN_SECRET=your_refresh_secret
+REFRESH_TOKEN_SECRET=your_refresh_token_secret
 
 EMAIL_USER=your_email
 
@@ -272,34 +205,32 @@ CLIENT_URL=http://localhost:5173
 
 ## Installation
 
-### Clone Repository
+Clone the repository:
 
 ```bash
 git clone https://github.com/ayush349919/Alpha.git
 ```
 
-### Navigate to Project
+Navigate to the project:
 
 ```bash
 cd Alpha
 ```
 
-### Install Dependencies
-
-#### Root
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-#### Backend
+Install backend dependencies:
 
 ```bash
 cd server
 npm install
 ```
 
-#### Frontend
+Install frontend dependencies:
 
 ```bash
 cd ../client
@@ -310,13 +241,13 @@ npm install
 
 ## Redis Setup
 
-Start Redis Container
+Start Redis Container:
 
 ```bash
 docker start redis-server
 ```
 
-Verify Redis
+Verify Redis:
 
 ```bash
 docker ps
@@ -324,9 +255,9 @@ docker ps
 
 ---
 
-## Run Project
+## Run The Project
 
-From root directory:
+From the root directory:
 
 ```bash
 npm run dev
@@ -346,30 +277,30 @@ http://localhost:5000
 
 ---
 
-## Current Status
+## Project Status
 
 ### Completed
 
 - User Registration
 - User Login
 - JWT Authentication
-- Access Token & Refresh Token System
+- Access & Refresh Token System
 - Redis Session Management
 - Secure Logout
 - OTP-Based Password Recovery
-- OTP Cooldown Protection
 - OTP Rate Limiting
-- OTP Verification Attempt Limiting
-- User Profile APIs
-- Change Password API
-- Delete Account API
+- OTP Cooldown Protection
+- Profile Management
+- Change Password
+- Delete Account
+- Password Invalidation After Password Change
 
-### Upcoming
+### Next Steps
 
 - Redux Toolkit Integration
 - Axios Interceptors
-- Automatic Token Refresh Handling
-- Frontend Protected Routes
+- Automatic Access Token Refresh
+- Protected Frontend Routes
 - Role-Based Access Control (RBAC)
 - Docker Compose Setup
 - Deployment
@@ -378,9 +309,7 @@ http://localhost:5000
 
 ## Author
 
-Ayush Thakur
+**Ayush Thakur**
 
-- LinkedIn: https://linkedin.com/in/ayushthakur9919
 - GitHub: https://github.com/ayush349919
-
----
+- LinkedIn: https://linkedin.com/in/ayushthakur9919
