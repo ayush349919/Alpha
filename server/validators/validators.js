@@ -122,5 +122,51 @@ module.exports = {
     handleValidationErrors,
   ],
 
+  updateProfile: [
+    body("firstName")
+      .optional()
+      .trim()
+      .notEmpty()
+      .withMessage("First name cannot be empty"),
+
+    body("lastName")
+      .optional()
+      .trim(),
+
+    handleValidationErrors,
+
+  ],
+
+  changePassword: [
+    body("currentPassword")
+      .notEmpty()
+      .withMessage("Current password is required"),
+
+    body("newPassword")
+      .notEmpty()
+      .withMessage("New password is required")
+      .isLength({ min: 6 })
+      .withMessage("Password must be at least 6 characters long"),
+
+    body("confirmPassword")
+      .custom((value, { req }) => {
+        if (value !== req.body.newPassword) {
+          throw new Error("Passwords do not match");
+        }
+        return true;
+      }),
+
+    handleValidationErrors,
+  ],
+
+  deleteAccount: [
+    body("password")
+      .notEmpty()
+      .withMessage("Password is required"),
+
+    handleValidationErrors,
+  ],
+
+
 
 };
