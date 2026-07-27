@@ -45,6 +45,12 @@ module.exports = {
 
       return response.success(res, 201, "User registered successfully", {
         accessToken,
+        user : {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          role: user.role
+        }
       });
     } catch (error) {
       console.log(error.message);
@@ -81,8 +87,14 @@ module.exports = {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-      return response.success(res, 200, "Login successful", {
-        accessToken
+      return response.success(res, 200, "login successful", {
+        accessToken,
+        user : {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          role: user.role
+        }
       });
     } catch (error) {
       console.log(error.message);

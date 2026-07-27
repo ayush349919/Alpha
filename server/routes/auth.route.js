@@ -6,7 +6,7 @@ const validator = require("../validators/validators"); // validations with the h
 
 router.post("/register", validator.register, authController.register);
 router.post("/login", validator.login, authController.login);
-router.post("/refreshAccessToken", authController.refreshAccessToken);
+router.post("/refresh", authController.refreshAccessToken);
 router.post("/logout", authController.logout);
 
 
