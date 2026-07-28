@@ -45,7 +45,7 @@ module.exports = {
 
       return response.success(res, 201, "User registered successfully", {
         accessToken,
-        user : {
+        user: {
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
@@ -89,7 +89,7 @@ module.exports = {
 
       return response.success(res, 200, "login successful", {
         accessToken,
-        user : {
+        user: {
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
@@ -136,7 +136,13 @@ module.exports = {
       const newAccessToken = createAccessToken(user);
       return response.success(res, 200, "Token refreshed successfully",
         {
-          accessToken: newAccessToken
+          accessToken: newAccessToken,
+          user: {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            role: user.role,
+            email: user.email
+          }
         });
 
     } catch (error) {
