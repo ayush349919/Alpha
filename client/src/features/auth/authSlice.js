@@ -56,13 +56,13 @@ const authslice = createSlice({
                 state.error = null;
             })
             .addCase(refreshAccessToken.fulfilled, (state, action) => {
-                state.accessToken = action.payload.accessToken;
                 state.user = action.payload.user;
+                state.accessToken = action.payload.accessToken;
                 state.isAuthChecked = true;
             })
             .addCase(refreshAccessToken.rejected, (state) => {
-                state.accessToken = null;
                 state.user = null;
+                state.accessToken = null;
                 state.isAuthChecked = true;
             })
 
@@ -76,11 +76,11 @@ const authslice = createSlice({
                 state.loading = false;
                 state.user = null;
                 state.accessToken = null;
-                state.isAuthChecked = false;
+                state.isAuthChecked = true;
             })
 
             .addCase(logoutUser.rejected, (state, action) => {
-                state.loading = false;
+                state.loading = false; a
                 state.error = action.payload;
             })
 

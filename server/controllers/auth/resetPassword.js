@@ -23,7 +23,7 @@ module.exports = {
         );
       }
 
-      const canSendOTP = await otpCooldown(`otp-cooldown:${email}`, 60);
+      const canSendOTP = await otpCooldown(`otp-cooldown:${email}`, );
 
       if (!canSendOTP) {
         return response.error(

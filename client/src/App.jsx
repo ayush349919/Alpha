@@ -2,10 +2,9 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import ProtectedRoute from "./components/ProtectedRoutes";
 import Dashboard from "./pages/Dashboard";
-import Unauthorized from "./pages/UnAuthorized";
 import UnAuthorized from "./pages/UnAuthorized";
 import Register from "./pages/auth/Register";
-import SendOTP from "./pages/forgotpassword/SendOTP";
+import SendOTP from "./pages/forgotpassword/SendOTP"; 
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { refreshAccessToken } from "./features/auth/authThunk";
@@ -22,7 +21,7 @@ export default function App() {
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/forgotpassword" element={<SendOTP />} />
+        <Route path="/sendotp" element={<SendOTP />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />

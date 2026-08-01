@@ -102,54 +102,57 @@ module.exports = {
     }
   },
 
-  refreshAccessToken: async (req, res) => {
-    try {
-      const refreshToken = req.cookies?.refreshToken;
+ refreshAccessToken: async (req, res) => {
+  try {
+    const refreshToken = req.cookies?.refreshToken;
 
-      if (!refreshToken) {
-        return response.error(res, 401, "Session Expired please login again");
-      }
-
-      const decoded = verifyRefreshToken(refreshToken);
-      if (!decoded) {
-        return response.error(res, 403, "Refresh token is invalid or expired.");
-      }
-
-      const storedToken = await redisClient.get(
-        `refresh:${decoded.id}`
-      );
-
-      if (!storedToken) {
-        return response.error(res, 401, "Session Expired please login again");
-      }
-
-      if (storedToken !== refreshToken) {
-        return response.error(res, 401, "Session Expired please login again");
-
-      }
-
-      const user = await User.findById(decoded.id);
-      if (!user) {
-        return response.error(res, 404, "User not found.");
-      }
-
-      const newAccessToken = createAccessToken(user);
-      return response.success(res, 200, "Token refreshed successfully",
-        {
-          accessToken: newAccessToken,
-          user: {
-            firstName: user.firstName,
-            lastName: user.lastName,
-            role: user.role,
-            email: user.email
-          }
-        });
-
-    } catch (error) {
-      console.error(error);
-      return response.error(res, 500, "Internal server Error");
+    // No refresh token
+    if (!refreshToken) {
+      return response.error(res, 401, "Session expired. Please login again.");
     }
-  },
+
+    // Verify JWT
+    const decoded = verifyRefreshToken(refreshToken);
+    if (!decoded) {
+      return response.error(res, 401, "Session expired. Please login again.");
+    }
+
+    // Check Redis
+    const storedToken = await redisClient.get(`refresh:${decoded.id}`);
+
+    if (!storedToken || storedToken !== refreshToken) {
+      return response.error(res, 401, "Session expired. Please login again.");
+    }
+
+    // Get User
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return response.error(res, 404, "User not found.");
+    }
+
+    // Generate New Access Token
+    const newAccessToken = createAccessToken(user);
+
+    return response.success(
+      res,
+      200,
+      "Token refreshed successfully",
+      {
+        accessToken: newAccessToken,
+        user: {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+          email: user.email,
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Refresh Token Error:", error);
+    return response.error(res, 500, "Internal Server Error");
+  }
+},
 
   logout: async (req, res) => {
     try {

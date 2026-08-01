@@ -8,19 +8,14 @@ export const loginApi = async (data) => {
 export const registerApi = async (data) => {
     const response = await axiosInstance.post("/auth/register", data)
     return response.data.data;
-
 };
 
 export const refreshApi = async () => {
-    const response = await axiosInstance.post("/auth/refresh")
-    return response.data.data;
-}
+  const response = await axiosInstance.post("/auth/refresh");
+  return response.data.data;
+};
+
 export const logoutApi = async () => {
     const response = await axiosInstance.post("/auth/logout")
     return response.data.data;
 }
-
-
-
-
-

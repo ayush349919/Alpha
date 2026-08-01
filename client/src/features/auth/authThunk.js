@@ -28,16 +28,20 @@ export const registerUser = createAsyncThunk(
 );
 
 export const refreshAccessToken = createAsyncThunk(
-    "auth/refresh",
-    async (_, { rejectWithValue }) => {
-        try {
-            return await refreshApi();
-        } catch (error) {
-            return rejectWithValue(
-                error.response?.data?.message || "Refresh failed"
-            );
-        }
+  "auth/refresh",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await refreshApi();
+    } catch (error) {
+      if (error.response?.status === 401) {
+        return rejectWithValue(null);
+      }
+
+      return rejectWithValue(
+        error.response?.data?.message || "Refresh failed"
+      );
     }
+  }
 );
 
 export const logoutUser = createAsyncThunk(
@@ -55,19 +59,3 @@ export const logoutUser = createAsyncThunk(
     }
 );
 
-// export const sendOTP = createAsyncThunk(
-//     "auth/sendOTP",
-//     async (data, { rejectWithValue }) => {
-//         try {
-
-//             return await sendOTPApi(data);
-
-//         } catch (error) {
-
-//             return rejectWithValue(
-//                 error.response?.data?.message
-//             );
-
-//         }
-//     }
-// );
